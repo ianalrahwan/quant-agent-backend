@@ -28,3 +28,10 @@ async def test_sources_summary_returns_shape(client):
         assert source_type in data["sources"]
         assert "last_updated" in data["sources"][source_type]
         assert "count" in data["sources"][source_type]
+
+
+async def test_sources_summary_uppercases_symbol(client):
+    resp = await client.get("/sources/aapl/summary")
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["symbol"] == "AAPL"
