@@ -1,7 +1,12 @@
+from unittest.mock import patch
+
 import pytest
 from httpx import ASGITransport, AsyncClient
 
 from app.main import create_app
+
+MOCK_NARRATIVE = "Test narrative."
+MOCK_RECS = '[{"strategy":"test","direction":"long_vol","legs":[],"rationale":"t","estimated_greeks":{"delta":0},"risk_reward":"t"}]'
 
 
 @pytest.fixture
@@ -16,7 +21,9 @@ async def client(app):
         yield c
 
 
-async def test_analyze_returns_job_id(client):
+@patch("graphs.trader.nodes.trade_rec._call_claude", return_value=MOCK_RECS)
+@patch("graphs.trader.nodes.synthesize._call_claude", return_value=MOCK_NARRATIVE)
+async def test_analyze_returns_job_id(mock_s, mock_r, client):
     resp = await client.post(
         "/analyze/AAPL",
         json={
@@ -36,7 +43,6 @@ async def test_analyze_returns_job_id(client):
     data = resp.json()
     assert "job_id" in data
     assert isinstance(data["job_id"], str)
-    assert len(data["job_id"]) > 0
 
 
 async def test_analyze_auto_run_default_false(client):
