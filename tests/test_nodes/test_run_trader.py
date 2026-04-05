@@ -18,8 +18,13 @@ async def test_run_trader_invokes_graph(mock_synth, mock_rec):
     state: OrchestratorState = {
         "symbol": "AAPL",
         "scanner_signals": ScannerSignals(
-            iv_percentile=0.85, skew_kurtosis=0.6, dealer_gamma=-0.3,
-            term_structure=0.9, vanna=0.7, charm=0.4, composite=0.72,
+            iv_percentile=0.85,
+            skew_kurtosis=0.6,
+            dealer_gamma=-0.3,
+            term_structure=0.9,
+            vanna=0.7,
+            charm=0.4,
+            composite=0.72,
         ),
         "auto_run": True,
         "freshness": None,

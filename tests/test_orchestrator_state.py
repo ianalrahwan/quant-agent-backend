@@ -26,8 +26,14 @@ def test_freshness_report_all_fresh():
 def test_orchestrator_state_shape():
     hints = typing.get_type_hints(OrchestratorState)
     expected = [
-        "symbol", "scanner_signals", "auto_run", "freshness",
-        "discovery_needed", "trader_narrative", "trader_trade_recs", "job_id",
+        "symbol",
+        "scanner_signals",
+        "auto_run",
+        "freshness",
+        "discovery_needed",
+        "trader_narrative",
+        "trader_trade_recs",
+        "job_id",
     ]
     for key in expected:
         assert key in hints, f"Missing key: {key}"

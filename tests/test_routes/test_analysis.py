@@ -1,7 +1,7 @@
 from unittest.mock import patch
 
-import respx
 import pytest
+import respx
 from httpx import ASGITransport, AsyncClient, Response
 
 from app.main import create_app
