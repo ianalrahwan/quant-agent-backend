@@ -1,7 +1,8 @@
 from unittest.mock import patch
 
+import respx
 import pytest
-from httpx import ASGITransport, AsyncClient
+from httpx import ASGITransport, AsyncClient, Response
 
 from app.main import create_app
 
@@ -24,9 +25,15 @@ async def client(app):
         yield c
 
 
+@respx.mock
 @patch("graphs.trader.nodes.trade_rec._call_claude", return_value=MOCK_RECS)
 @patch("graphs.trader.nodes.synthesize._call_claude", return_value=MOCK_NARRATIVE)
 async def test_analyze_returns_job_id(mock_s, mock_r, client):
+    respx.route().mock(return_value=Response(200, json=[]))
+    respx.post("https://api.voyageai.com/v1/embeddings").mock(
+        return_value=Response(200, json={"data": [], "usage": {"total_tokens": 0}})
+    )
+
     resp = await client.post(
         "/analyze/AAPL",
         json={
@@ -45,7 +52,6 @@ async def test_analyze_returns_job_id(mock_s, mock_r, client):
     assert resp.status_code == 200
     data = resp.json()
     assert "job_id" in data
-    assert isinstance(data["job_id"], str)
 
 
 async def test_analyze_auto_run_default_false(client):

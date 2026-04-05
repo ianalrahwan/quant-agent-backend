@@ -4,8 +4,8 @@ import structlog
 from fastapi import APIRouter, BackgroundTasks
 from pydantic import BaseModel
 
-from graphs.trader.graph import build_trader_graph
-from graphs.trader.state import TraderState
+from graphs.orchestrator.graph import build_orchestrator_graph
+from graphs.orchestrator.state import OrchestratorState
 from models.common import JobResponse, ScannerSignals
 
 logger = structlog.get_logger()
@@ -18,20 +18,20 @@ class AnalyzeRequest(BaseModel):
     auto_run: bool = False
 
 
-async def _run_trader(state: TraderState) -> None:
-    """Run the trader graph in the background."""
+async def _run_orchestrator(state: OrchestratorState) -> None:
+    """Run the orchestrator graph in the background."""
     try:
-        graph = build_trader_graph(checkpointer=None)
+        graph = build_orchestrator_graph()
         result = await graph.ainvoke(state)
         logger.info(
-            "trader.complete",
+            "orchestrator.complete",
             job_id=state["job_id"],
             symbol=state["symbol"],
-            recs=len(result.get("trade_recs", [])),
+            recs=len(result.get("trader_trade_recs", [])),
         )
     except Exception as exc:
         logger.error(
-            "trader.failed",
+            "orchestrator.failed",
             job_id=state["job_id"],
             error=str(exc),
         )
@@ -43,23 +43,20 @@ async def analyze(
     request: AnalyzeRequest,
     background_tasks: BackgroundTasks,
 ) -> JobResponse:
-    """Kick off the trader analysis graph for a symbol."""
+    """Kick off the full orchestrator graph for a symbol."""
     job_id = f"job-{uuid4().hex[:12]}"
 
-    state: TraderState = {
+    state: OrchestratorState = {
         "symbol": symbol.upper(),
         "scanner_signals": request.scanner_signals,
         "auto_run": request.auto_run,
-        "confirmed_signals": None,
-        "vol_analysis": None,
-        "narrative_context": None,
-        "narrative": "",
-        "trade_recs": [],
+        "freshness": None,
+        "discovery_needed": False,
+        "trader_narrative": "",
+        "trader_trade_recs": [],
         "job_id": job_id,
-        "checkpoints_hit": [],
-        "user_inputs": {},
     }
 
-    background_tasks.add_task(_run_trader, state)
+    background_tasks.add_task(_run_orchestrator, state)
 
     return JobResponse(job_id=job_id)
