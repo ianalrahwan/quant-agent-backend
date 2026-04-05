@@ -1,7 +1,7 @@
 import httpx
 import structlog
 
-from data.models import DocumentChunk, RawDocument, SourceType
+from data.models import DocumentChunk, RawDocument
 from graphs.discovery.state import DiscoveryState
 
 logger = structlog.get_logger()

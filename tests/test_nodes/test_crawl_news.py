@@ -5,7 +5,6 @@ from data.models import SourceType
 from graphs.discovery.nodes.crawl_news import crawl_news_node
 from graphs.discovery.state import DiscoveryState
 
-
 NEWS_API_RESPONSE = {
     "status": "ok",
     "totalResults": 1,
@@ -14,7 +13,7 @@ NEWS_API_RESPONSE = {
             "title": "Apple Reports Record Revenue",
             "url": "https://news.example.com/apple-revenue",
             "publishedAt": "2026-04-01T14:00:00Z",
-            "content": "Apple reported record quarterly revenue of $124 billion, beating analyst expectations.",
+            "content": "Apple reported record quarterly revenue of $124B.",
         }
     ],
 }
@@ -45,7 +44,7 @@ async def test_crawl_news_fetches_articles():
     doc = result["raw_documents"][0]
     assert doc.ticker == "AAPL"
     assert doc.source_type == SourceType.NEWS
-    assert "record quarterly revenue" in doc.raw_text
+    assert "quarterly revenue" in doc.raw_text
     assert SourceType.NEWS in result["completed_sources"]
 
 

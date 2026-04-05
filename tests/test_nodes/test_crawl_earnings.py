@@ -5,7 +5,6 @@ from data.models import SourceType
 from graphs.discovery.nodes.crawl_earnings import crawl_earnings_node
 from graphs.discovery.state import DiscoveryState
 
-
 FMP_TRANSCRIPT_RESPONSE = [
     {
         "symbol": "AAPL",

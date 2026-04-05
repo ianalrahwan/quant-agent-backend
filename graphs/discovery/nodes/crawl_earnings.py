@@ -20,9 +20,7 @@ async def crawl_earnings_node(state: DiscoveryState) -> dict:
     async with httpx.AsyncClient(timeout=30.0) as client:
         for ticker in tickers:
             try:
-                resp = await client.get(
-                    f"{FMP_BASE_URL}/earning_call_transcript/{ticker}"
-                )
+                resp = await client.get(f"{FMP_BASE_URL}/earning_call_transcript/{ticker}")
                 resp.raise_for_status()
                 transcripts = resp.json()
 
@@ -31,7 +29,10 @@ async def crawl_earnings_node(state: DiscoveryState) -> dict:
                         RawDocument(
                             source_type=SourceType.EARNINGS,
                             ticker=ticker,
-                            title=f"{ticker} Q{t.get('quarter', '?')} {t.get('year', '?')} Earnings Call",
+                            title=(
+                                f"{ticker} Q{t.get('quarter', '?')}"
+                                f" {t.get('year', '?')} Earnings Call"
+                            ),
                             url=f"{FMP_BASE_URL}/earning_call_transcript/{ticker}",
                             raw_text=t.get("content", ""),
                             published_at=datetime.fromisoformat(t["date"]),

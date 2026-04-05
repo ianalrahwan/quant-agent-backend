@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from data.models import RawDocument, CrawlError, DocumentChunk, SourceType
+from data.models import CrawlError, DocumentChunk, RawDocument, SourceType
 
 
 def test_source_type_values():

@@ -5,9 +5,12 @@ from data.models import SourceType
 from graphs.discovery.nodes.crawl_cftc import crawl_cftc_node
 from graphs.discovery.state import DiscoveryState
 
-MOCK_CFTC_CSV = """Market_and_Exchange_Names,Report_Date_as_YYYY-MM-DD,NonComm_Positions_Long_All,NonComm_Positions_Short_All
-CRUDE OIL - NEW YORK MERCANTILE EXCHANGE,2026-04-01,300000,250000
-GOLD - COMMODITY EXCHANGE INC.,2026-04-01,200000,150000"""
+MOCK_CFTC_CSV = (
+    "Market_and_Exchange_Names,Report_Date_as_YYYY-MM-DD,"
+    "NonComm_Positions_Long_All,NonComm_Positions_Short_All\n"
+    "CRUDE OIL - NEW YORK MERCANTILE EXCHANGE,2026-04-01,300000,250000\n"
+    "GOLD - COMMODITY EXCHANGE INC.,2026-04-01,200000,150000"
+)
 
 
 @respx.mock

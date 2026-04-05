@@ -1,5 +1,4 @@
-from datetime import datetime
-from unittest.mock import AsyncMock, MagicMock
+from unittest.mock import AsyncMock
 
 from data.models import DocumentChunk, SourceType
 from graphs.discovery.nodes.index import index_node, store_chunks

@@ -2,7 +2,7 @@ import respx
 from httpx import Response
 
 from data.models import SourceType
-from graphs.discovery.nodes.crawl_podcasts import crawl_podcasts_node, PODCAST_FEEDS
+from graphs.discovery.nodes.crawl_podcasts import PODCAST_FEEDS, crawl_podcasts_node
 from graphs.discovery.state import DiscoveryState
 
 MOCK_RSS = """<?xml version="1.0" encoding="UTF-8"?>
@@ -13,7 +13,7 @@ MOCK_RSS = """<?xml version="1.0" encoding="UTF-8"?>
       <title>Episode 420: Volatility Regime Change</title>
       <link>https://podcast.example.com/ep420</link>
       <pubDate>Tue, 01 Apr 2026 12:00:00 GMT</pubDate>
-      <description>Discussion of the current vol regime shift and implications for options traders.</description>
+      <description>Discussion of the current vol regime shift.</description>
     </item>
   </channel>
 </rss>"""

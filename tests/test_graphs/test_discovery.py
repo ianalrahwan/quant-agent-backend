@@ -5,7 +5,6 @@ from data.models import SourceType
 from graphs.discovery.graph import build_discovery_graph
 from graphs.discovery.state import DiscoveryState
 
-
 MOCK_FMP_RESPONSE = [
     {
         "symbol": "AAPL",
@@ -47,9 +46,7 @@ async def test_discovery_graph_full_run():
     respx.get("https://feeds.example.com/macrovoices").mock(
         return_value=Response(500, text="Error")
     )
-    respx.get("https://feeds.example.com/oddlots").mock(
-        return_value=Response(500, text="Error")
-    )
+    respx.get("https://feeds.example.com/oddlots").mock(return_value=Response(500, text="Error"))
     respx.get("https://www.cftc.gov/dea/newcot/deafut.txt").mock(
         return_value=Response(500, text="Error")
     )
@@ -85,13 +82,18 @@ async def test_discovery_graph_full_run():
 async def test_discovery_graph_selective_sources():
     """Run with only earnings source selected."""
     respx.get("https://financialmodelingprep.com/api/v3/earning_call_transcript/TSLA").mock(
-        return_value=Response(200, json=[{
-            "symbol": "TSLA",
-            "quarter": 1,
-            "year": 2026,
-            "date": "2026-01-30",
-            "content": "Vehicle deliveries increased.",
-        }])
+        return_value=Response(
+            200,
+            json=[
+                {
+                    "symbol": "TSLA",
+                    "quarter": 1,
+                    "year": 2026,
+                    "date": "2026-01-30",
+                    "content": "Vehicle deliveries increased.",
+                }
+            ],
+        )
     )
     respx.post("https://api.voyageai.com/v1/embeddings").mock(
         return_value=Response(200, json=MOCK_VOYAGE_RESPONSE)

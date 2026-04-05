@@ -4,8 +4,8 @@ from uuid import uuid4
 import structlog
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from data.models import DocumentChunk, SourceType
-from db.models import Chunk, Document, SourceRun
+from data.models import DocumentChunk
+from db.models import Chunk, Document
 from graphs.discovery.state import DiscoveryState
 
 logger = structlog.get_logger()

@@ -57,9 +57,7 @@ async def crawl_cftc_node(state: DiscoveryState) -> dict:
 
     except Exception as exc:
         logger.error("crawl_cftc.error", error=str(exc))
-        errors.append(
-            CrawlError(source_type=SourceType.CFTC, error=str(exc))
-        )
+        errors.append(CrawlError(source_type=SourceType.CFTC, error=str(exc)))
 
     return {
         "raw_documents": documents,

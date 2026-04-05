@@ -1,4 +1,3 @@
-import asyncio
 from datetime import datetime
 from uuid import uuid4
 
@@ -47,9 +46,7 @@ async def discover(
     """Trigger the resource discovery graph."""
     run_id = f"discovery-{uuid4().hex[:12]}"
 
-    source_types = (
-        [SourceType(s) for s in request.source_types] if request.source_types else None
-    )
+    source_types = [SourceType(s) for s in request.source_types] if request.source_types else None
 
     state: DiscoveryState = {
         "trigger_type": "manual",
