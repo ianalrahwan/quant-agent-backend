@@ -42,19 +42,13 @@ def _build_prompt(state: TraderState) -> str:
 
     if ctx:
         if ctx.earnings:
-            earnings_text = "; ".join(
-                f"{e['title']}: {e['text']}" for e in ctx.earnings[:3]
-            )
+            earnings_text = "; ".join(f"{e['title']}: {e['text']}" for e in ctx.earnings[:3])
             parts.append(f"Recent earnings: {earnings_text}")
         if ctx.news:
-            news_text = "; ".join(
-                f"{n['title']}: {n['text']}" for n in ctx.news[:5]
-            )
+            news_text = "; ".join(f"{n['title']}: {n['text']}" for n in ctx.news[:5])
             parts.append(f"Recent news: {news_text}")
         if ctx.podcasts:
-            pod_text = "; ".join(
-                f"{p['title']}: {p['text']}" for p in ctx.podcasts[:3]
-            )
+            pod_text = "; ".join(f"{p['title']}: {p['text']}" for p in ctx.podcasts[:3])
             parts.append(f"Podcast context: {pod_text}")
         if ctx.positioning:
             parts.append(f"Positioning data: {ctx.positioning}")

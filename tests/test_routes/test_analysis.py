@@ -6,7 +6,10 @@ from httpx import ASGITransport, AsyncClient
 from app.main import create_app
 
 MOCK_NARRATIVE = "Test narrative."
-MOCK_RECS = '[{"strategy":"test","direction":"long_vol","legs":[],"rationale":"t","estimated_greeks":{"delta":0},"risk_reward":"t"}]'
+MOCK_RECS = (
+    '[{"strategy":"test","direction":"long_vol","legs":[],'
+    '"rationale":"t","estimated_greeks":{"delta":0},"risk_reward":"t"}]'
+)
 
 
 @pytest.fixture

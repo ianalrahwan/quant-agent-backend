@@ -7,8 +7,13 @@ async def test_signal_confirm_valid():
     state: TraderState = {
         "symbol": "AAPL",
         "scanner_signals": ScannerSignals(
-            iv_percentile=0.85, skew_kurtosis=0.6, dealer_gamma=-0.3,
-            term_structure=0.9, vanna=0.7, charm=0.4, composite=0.72,
+            iv_percentile=0.85,
+            skew_kurtosis=0.6,
+            dealer_gamma=-0.3,
+            term_structure=0.9,
+            vanna=0.7,
+            charm=0.4,
+            composite=0.72,
         ),
         "auto_run": False,
         "confirmed_signals": None,
@@ -30,8 +35,13 @@ async def test_signal_confirm_detects_backwardation():
     state: TraderState = {
         "symbol": "AAPL",
         "scanner_signals": ScannerSignals(
-            iv_percentile=0.5, skew_kurtosis=0.5, dealer_gamma=-0.3,
-            term_structure=0.8, vanna=0.5, charm=0.5, composite=0.5,
+            iv_percentile=0.5,
+            skew_kurtosis=0.5,
+            dealer_gamma=-0.3,
+            term_structure=0.8,
+            vanna=0.5,
+            charm=0.5,
+            composite=0.5,
         ),
         "auto_run": False,
         "confirmed_signals": None,
@@ -53,8 +63,13 @@ async def test_signal_confirm_low_composite_invalid():
     state: TraderState = {
         "symbol": "AAPL",
         "scanner_signals": ScannerSignals(
-            iv_percentile=0.1, skew_kurtosis=0.1, dealer_gamma=0.1,
-            term_structure=0.1, vanna=0.1, charm=0.1, composite=0.15,
+            iv_percentile=0.1,
+            skew_kurtosis=0.1,
+            dealer_gamma=0.1,
+            term_structure=0.1,
+            vanna=0.1,
+            charm=0.1,
+            composite=0.15,
         ),
         "auto_run": False,
         "confirmed_signals": None,

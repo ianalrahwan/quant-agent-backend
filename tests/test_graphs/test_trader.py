@@ -8,7 +8,11 @@ from graphs.trader.state import TraderState
 from models.common import ScannerSignals
 
 MOCK_NARRATIVE = "AAPL vol elevated due to earnings."
-MOCK_TRADE_RECS = '[{"strategy":"calendar_spread","direction":"long_vol","legs":[],"rationale":"test","estimated_greeks":{"delta":0},"risk_reward":"test"}]'
+MOCK_TRADE_RECS = (
+    '[{"strategy":"calendar_spread","direction":"long_vol",'
+    '"legs":[],"rationale":"test",'
+    '"estimated_greeks":{"delta":0},"risk_reward":"test"}]'
+)
 
 
 def _make_initial_state() -> TraderState:
