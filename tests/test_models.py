@@ -1,7 +1,7 @@
 import json
 
-from models.common import ScannerSignals, JobResponse, JobStatus
-from models.events import PhaseEvent, CheckpointEvent, StreamEvent, DoneEvent
+from models.common import JobResponse, JobStatus, ScannerSignals
+from models.events import CheckpointEvent, DoneEvent, PhaseEvent, StreamEvent
 
 
 def test_scanner_signals():

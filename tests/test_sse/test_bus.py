@@ -1,8 +1,9 @@
 import asyncio
+
 import pytest
 
-from models.events import PhaseEvent, DoneEvent
-from sse.bus import SSEBus, InMemorySSEBus
+from models.events import DoneEvent, PhaseEvent
+from sse.bus import InMemorySSEBus
 
 
 @pytest.fixture

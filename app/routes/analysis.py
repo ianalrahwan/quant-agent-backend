@@ -3,7 +3,7 @@ from uuid import uuid4
 from fastapi import APIRouter
 from pydantic import BaseModel
 
-from models.common import ScannerSignals, JobResponse
+from models.common import JobResponse, ScannerSignals
 
 router = APIRouter()
 

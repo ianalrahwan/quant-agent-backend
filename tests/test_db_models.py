@@ -1,7 +1,7 @@
 from datetime import datetime
 from uuid import uuid4
 
-from db.models import Document, Chunk, SourceRun, Job
+from db.models import Chunk, Document, Job, SourceRun
 
 
 def test_document_model_fields():

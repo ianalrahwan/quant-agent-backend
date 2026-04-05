@@ -1,9 +1,10 @@
 import asyncio
+
 import pytest
 from httpx import ASGITransport, AsyncClient
 
 from app.main import create_app
-from models.events import PhaseEvent, DoneEvent
+from models.events import DoneEvent, PhaseEvent
 from sse.bus import InMemorySSEBus
 
 
@@ -43,7 +44,7 @@ async def test_stream_receives_sse_events(client, bus):
 
     # Parse SSE lines
     lines = resp.text.strip().split("\n")
-    events = [l for l in lines if l.startswith("event:")]
+    events = [line for line in lines if line.startswith("event:")]
     assert len(events) >= 2
     assert "event: phase" in events[0]
     assert "event: done" in events[1]
