@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.logging import setup_logging
-from app.routes import health
+from app.routes import analysis, health
 from sse.bus import InMemorySSEBus
 
 
@@ -33,6 +33,7 @@ def create_app() -> FastAPI:
     )
 
     app.include_router(health.router)
+    app.include_router(analysis.router)
 
     return app
 
