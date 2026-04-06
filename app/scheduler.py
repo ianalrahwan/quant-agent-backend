@@ -6,6 +6,7 @@ import structlog
 
 from app.scanner.engine import run_scan
 from data.cache_repo import delete_stale_analyses, upsert_cached_analysis
+from data.scanner_repo import delete_stale_scanner_results, upsert_scanner_result
 from graphs.orchestrator.graph import build_orchestrator_graph
 from graphs.orchestrator.state import OrchestratorState
 from sse.bus import set_bus_context
@@ -68,6 +69,18 @@ async def analysis_refresh_loop(app):
             logger.info("scheduler.refresh_start")
             tickers = await run_scan()
             logger.info("scheduler.scan_complete", count=len(tickers))
+            # Store all scanner scores to DB for instant frontend loading
+            async with session_factory() as session:
+                for symbol, signals in tickers:
+                    scores = signals.model_dump() if hasattr(signals, "model_dump") else signals
+                    await upsert_scanner_result(
+                        session=session,
+                        symbol=symbol,
+                        scores=scores,
+                        composite=scores.get("composite", 0),
+                    )
+                await delete_stale_scanner_results(session, max_age_seconds=600)
+            logger.info("scheduler.scanner_results_stored", count=len(tickers))
             for symbol, signals in tickers[:10]:
                 await _run_for_ticker(app, symbol, signals, session_factory)
             async with session_factory() as session:
