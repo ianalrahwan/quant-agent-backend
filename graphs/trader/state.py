@@ -1,8 +1,13 @@
-from typing import Any, TypedDict
+from typing import Annotated, Any, TypedDict
 
 from pydantic import BaseModel
 
 from models.common import ScannerSignals
+
+
+def _merge_lists(left: list, right: list) -> list:
+    """Reducer that merges lists."""
+    return left + right
 
 
 class ConfirmedSignals(BaseModel):
@@ -75,3 +80,6 @@ class TraderState(TypedDict):
     job_id: str
     checkpoints_hit: list[str]
     user_inputs: dict[str, Any]
+
+    # Logs
+    logs: Annotated[list[str], _merge_lists]

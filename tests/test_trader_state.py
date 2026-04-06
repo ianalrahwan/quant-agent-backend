@@ -78,6 +78,7 @@ def test_trader_state_shape():
         "job_id",
         "checkpoints_hit",
         "user_inputs",
+        "logs",
     ]
     for key in expected_keys:
         assert key in hints, f"Missing key: {key}"

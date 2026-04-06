@@ -1,9 +1,14 @@
-from typing import TypedDict
+from typing import Annotated, TypedDict
 
 from pydantic import BaseModel
 
 from graphs.trader.state import TradeRecommendation
 from models.common import ScannerSignals
+
+
+def _merge_lists(left: list, right: list) -> list:
+    """Reducer that merges lists."""
+    return left + right
 
 
 class FreshnessReport(BaseModel):
@@ -32,3 +37,6 @@ class OrchestratorState(TypedDict):
 
     # Metadata
     job_id: str
+
+    # Logs
+    logs: Annotated[list[str], _merge_lists]

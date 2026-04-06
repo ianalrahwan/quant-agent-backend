@@ -21,6 +21,7 @@ async def run_trader_node(state: OrchestratorState) -> dict:
         "job_id": state["job_id"],
         "checkpoints_hit": [],
         "user_inputs": {},
+        "logs": [],
     }
 
     graph = build_trader_graph(checkpointer=None)

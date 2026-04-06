@@ -59,6 +59,7 @@ async def discover(
         "run_id": run_id,
         "started_at": datetime.utcnow(),
         "completed_sources": [],
+        "logs": [],
     }
 
     background_tasks.add_task(_run_discovery, state)

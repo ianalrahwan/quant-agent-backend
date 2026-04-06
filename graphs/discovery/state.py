@@ -29,3 +29,6 @@ class DiscoveryState(TypedDict):
     run_id: str
     started_at: datetime
     completed_sources: Annotated[list[SourceType], _merge_lists]
+
+    # Logs
+    logs: Annotated[list[str], _merge_lists]

@@ -55,6 +55,7 @@ async def analyze(
         "trader_narrative": "",
         "trader_trade_recs": [],
         "job_id": job_id,
+        "logs": [],
     }
 
     background_tasks.add_task(_run_orchestrator, state)

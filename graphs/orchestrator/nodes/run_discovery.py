@@ -30,6 +30,7 @@ async def run_discovery_node(state: OrchestratorState) -> dict:
         "run_id": f"orch-{state['job_id']}",
         "started_at": datetime.now(UTC),
         "completed_sources": [],
+        "logs": [],
     }
 
     graph = build_discovery_graph()
