@@ -28,6 +28,7 @@ def test_settings_from_env(monkeypatch):
 
 
 def test_settings_from_db_components(monkeypatch):
+    monkeypatch.delenv("DATABASE_URL", raising=False)
     monkeypatch.setenv("DB_HOST", "mydb.rds.amazonaws.com")
     monkeypatch.setenv("DB_PASSWORD", "secret123")
     monkeypatch.setenv("REDIS_URL", "redis://localhost:6379/0")
