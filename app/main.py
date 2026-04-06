@@ -21,12 +21,18 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     if not hasattr(app.state, "sse_bus"):
         app.state.sse_bus = InMemorySSEBus()
 
-    # Ensure pgvector extension is available
+    # Run migrations and ensure pgvector extension
     settings = Settings()
     engine = create_async_engine(settings.effective_database_url)
     async with engine.begin() as conn:
         await conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
     await engine.dispose()
+
+    from alembic import command
+    from alembic.config import Config
+
+    alembic_cfg = Config("alembic.ini")
+    command.upgrade(alembic_cfg, "head")
 
     app.state.session_factory = create_session_factory(settings.effective_database_url)
 
