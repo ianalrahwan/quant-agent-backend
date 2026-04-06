@@ -2,7 +2,7 @@ from datetime import datetime
 from uuid import UUID, uuid4
 
 from pgvector.sqlalchemy import Vector
-from sqlalchemy import DateTime, Integer, String, Text
+from sqlalchemy import DateTime, Float, Integer, JSON, String, Text, func
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
@@ -53,3 +53,22 @@ class Job(Base):
     status: Mapped[str] = mapped_column(String(20), default="pending")
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
     completed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
+class CachedAnalysis(Base):
+    """Pre-computed analysis results for instant loading."""
+
+    __tablename__ = "cached_analyses"
+
+    symbol: Mapped[str] = mapped_column(String(10), primary_key=True)
+    scanner_signals: Mapped[dict] = mapped_column(JSON, nullable=False)
+    narrative: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    trade_recs: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
+    vol_surface: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    phases_log: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
+    total_time: Mapped[float | None] = mapped_column(Float, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+    )

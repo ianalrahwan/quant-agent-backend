@@ -1,7 +1,7 @@
 from datetime import datetime
 from uuid import uuid4
 
-from db.models import Chunk, Document, Job, SourceRun
+from db.models import CachedAnalysis, Chunk, Document, Job, SourceRun
 
 
 def test_document_model_fields():
@@ -57,3 +57,20 @@ def test_job_model_fields():
     )
     assert job.symbol == "TSLA"
     assert job.status == "running"
+
+
+def test_cached_analysis_model_fields():
+    ca = CachedAnalysis(
+        symbol="SPY",
+        scanner_signals={"iv_percentile": 0.72},
+        narrative="Elevated vol regime.",
+        trade_recs=[{"strategy": "iron_condor"}],
+        vol_surface={"skew": -0.08},
+        phases_log=[{"phase": "scanner", "time": 1.1}],
+        total_time=4.2,
+    )
+    assert ca.symbol == "SPY"
+    assert ca.scanner_signals["iv_percentile"] == 0.72
+    assert ca.narrative == "Elevated vol regime."
+    assert len(ca.trade_recs) == 1
+    assert ca.total_time == 4.2
