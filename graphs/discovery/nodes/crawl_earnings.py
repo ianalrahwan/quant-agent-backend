@@ -51,8 +51,16 @@ async def crawl_earnings_node(state: DiscoveryState) -> dict:
                     )
                 )
 
+    tickers_str = ", ".join(tickers) if tickers else "none"
+    logs = [f"Crawling earnings transcripts for {tickers_str}..."]
+    if documents:
+        logs.append(f"Found {len(documents)} earnings transcripts")
+    if errors:
+        logs.append(f"Earnings crawl failed: {errors[0].error}")
+
     return {
         "raw_documents": documents,
         "crawl_errors": errors,
         "completed_sources": [SourceType.EARNINGS],
+        "logs": logs,
     }

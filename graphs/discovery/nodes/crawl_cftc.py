@@ -59,8 +59,15 @@ async def crawl_cftc_node(state: DiscoveryState) -> dict:
         logger.error("crawl_cftc.error", error=str(exc))
         errors.append(CrawlError(source_type=SourceType.CFTC, error=str(exc)))
 
+    logs = ["Fetching CFTC positioning data..."]
+    if documents:
+        logs.append(f"Parsed {len(documents)} CFTC positions")
+    if errors:
+        logs.append(f"CFTC fetch failed: {errors[0].error}")
+
     return {
         "raw_documents": documents,
         "crawl_errors": errors,
         "completed_sources": [SourceType.CFTC],
+        "logs": logs,
     }

@@ -72,8 +72,15 @@ async def crawl_podcasts_node(state: DiscoveryState) -> dict:
                     )
                 )
 
+    logs = ["Crawling podcast feeds..."]
+    if documents:
+        logs.append(f"Found {len(documents)} podcast episodes")
+    if errors:
+        logs.append(f"Podcast crawl had {len(errors)} feed errors")
+
     return {
         "raw_documents": documents,
         "crawl_errors": errors,
         "completed_sources": [SourceType.PODCAST],
+        "logs": logs,
     }

@@ -56,8 +56,16 @@ async def crawl_news_node(state: DiscoveryState) -> dict:
                     )
                 )
 
+    tickers_str = ", ".join(tickers) if tickers else "none"
+    logs = [f"Crawling news for {tickers_str}..."]
+    if documents:
+        logs.append(f"Found {len(documents)} news articles")
+    if errors:
+        logs.append(f"News crawl failed: {errors[0].error}")
+
     return {
         "raw_documents": documents,
         "crawl_errors": errors,
         "completed_sources": [SourceType.NEWS],
+        "logs": logs,
     }

@@ -68,4 +68,7 @@ async def index_node(state: DiscoveryState) -> dict:
         embeddings_stored=embeddings_stored,
     )
 
-    return {"embeddings_stored": embeddings_stored}
+    return {
+        "embeddings_stored": embeddings_stored,
+        "logs": [f"Indexing {len(chunks)} chunks to pgvector..."],
+    }

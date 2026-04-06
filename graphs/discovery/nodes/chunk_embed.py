@@ -93,4 +93,10 @@ async def chunk_embed_node(state: DiscoveryState) -> dict:
                 logger.error("chunk_embed.batch_error", error=str(exc), batch_size=len(batch))
 
     logger.info("chunk_embed.complete", total_chunks=len(all_chunks))
-    return {"chunks": all_chunks, "embeddings_stored": len(all_chunks)}
+
+    logs = []
+    if raw_documents:
+        logs.append(f"Chunking {len(raw_documents)} documents...")
+        logs.append(f"Embedded {len(all_chunks)} chunks")
+
+    return {"chunks": all_chunks, "embeddings_stored": len(all_chunks), "logs": logs}
