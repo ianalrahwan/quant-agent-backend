@@ -1,6 +1,7 @@
 import asyncio
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
+from functools import partial
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -13,6 +14,17 @@ from app.routes import analysis, cached, discovery, health, sources, stream
 from app.scheduler import analysis_refresh_loop
 from db.session import create_session_factory
 from sse.bus import InMemorySSEBus
+
+
+def _run_alembic_upgrade(db_url: str) -> None:
+    """Run Alembic upgrade in a sync context (called from a thread)."""
+    from alembic.config import Config
+
+    from alembic import command
+
+    alembic_cfg = Config("alembic.ini")
+    alembic_cfg.set_main_option("sqlalchemy.url", db_url)
+    command.upgrade(alembic_cfg, "head")
 
 
 @asynccontextmanager
@@ -28,13 +40,9 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         await conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
     await engine.dispose()
 
-    from alembic.config import Config
-
-    from alembic import command
-
-    alembic_cfg = Config("alembic.ini")
-    alembic_cfg.set_main_option("sqlalchemy.url", settings.effective_database_url)
-    command.upgrade(alembic_cfg, "head")
+    # Run Alembic in a thread so asyncio.run() inside env.py works
+    loop = asyncio.get_running_loop()
+    await loop.run_in_executor(None, partial(_run_alembic_upgrade, settings.effective_database_url))
 
     app.state.session_factory = create_session_factory(settings.effective_database_url)
 
