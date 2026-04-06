@@ -56,4 +56,10 @@ async def vol_surface_node(state: TraderState) -> dict:
 
     logger.info("vol_surface.done", symbol=state["symbol"], regime=regime)
 
-    return {"vol_analysis": analysis}
+    return {
+        "vol_analysis": analysis,
+        "logs": [
+            f"Analyzing vol surface for {state['symbol']}...",
+            f"Vol surface: {regime}, IV {signals.iv_percentile:.0%}ile",
+        ],
+    }

@@ -70,4 +70,10 @@ async def trade_rec_node(state: TraderState) -> dict:
 
     logger.info("trade_rec.done", symbol=state["symbol"], count=len(trade_recs))
 
-    return {"trade_recs": trade_recs}
+    return {
+        "trade_recs": trade_recs,
+        "logs": [
+            f"Generating trade recommendations for {state['symbol']}...",
+            f"Generated {len(trade_recs)} trade recommendations",
+        ],
+    }

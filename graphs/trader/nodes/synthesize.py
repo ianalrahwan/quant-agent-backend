@@ -69,4 +69,10 @@ async def synthesize_node(state: TraderState) -> dict:
     narrative = await _call_claude(prompt)
     logger.info("synthesize.done", symbol=state["symbol"], length=len(narrative))
 
-    return {"narrative": narrative}
+    return {
+        "narrative": narrative,
+        "logs": [
+            f"Generating narrative with Claude for {state['symbol']}...",
+            f"Narrative generated ({len(narrative)} chars)",
+        ],
+    }

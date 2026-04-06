@@ -34,4 +34,10 @@ async def narrative_query_node(state: TraderState) -> dict:
         podcast_count=len(podcasts),
     )
 
-    return {"narrative_context": context}
+    return {
+        "narrative_context": context,
+        "logs": [
+            f"Querying narrative context for {symbol}...",
+            f"Found {len(earnings)} earnings, {len(news)} news, {len(podcasts)} podcast sources",
+        ],
+    }

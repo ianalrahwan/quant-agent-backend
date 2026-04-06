@@ -48,4 +48,10 @@ async def signal_confirm_node(state: TraderState) -> dict:
 
     logger.info("signal_confirm.done", symbol=state["symbol"], valid=is_valid, regime=ts_regime)
 
-    return {"confirmed_signals": confirmed}
+    logs = [f"Validating scanner signals for {state['symbol']}..."]
+    if is_valid:
+        logs.append(f"Signals confirmed: {ts_regime}, composite {signals.composite:.2f}")
+    else:
+        logs.append(f"Signals too weak (composite {signals.composite:.2f})")
+
+    return {"confirmed_signals": confirmed, "logs": logs}
