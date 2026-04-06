@@ -47,9 +47,7 @@ async def _run_orchestrator(bus: SSEBus, state: OrchestratorState) -> None:
 
                 # Publish phase completion (skip trader — it emits its own)
                 if phase is not None:
-                    await emit(
-                        PhaseEvent(phase=phase, status="complete").to_sse()
-                    )
+                    await emit(PhaseEvent(phase=phase, status="complete").to_sse())
 
         elapsed = time.monotonic() - t0
         await emit(DoneEvent(job_id=job_id, total_time=elapsed).to_sse())

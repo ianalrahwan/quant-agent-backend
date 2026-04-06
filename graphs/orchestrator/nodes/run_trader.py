@@ -54,9 +54,7 @@ async def run_trader_node(state: OrchestratorState) -> dict:
                     vol = node_output["vol_analysis"]
                     phase_data = vol.model_dump() if hasattr(vol, "model_dump") else None
 
-                await emit(
-                    PhaseEvent(phase=phase, status="complete", data=phase_data).to_sse()
-                )
+                await emit(PhaseEvent(phase=phase, status="complete", data=phase_data).to_sse())
 
     logger.info(
         "run_trader.done",
