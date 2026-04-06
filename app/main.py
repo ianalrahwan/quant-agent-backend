@@ -33,6 +33,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     from alembic import command
 
     alembic_cfg = Config("alembic.ini")
+    alembic_cfg.set_main_option("sqlalchemy.url", settings.effective_database_url)
     command.upgrade(alembic_cfg, "head")
 
     app.state.session_factory = create_session_factory(settings.effective_database_url)
