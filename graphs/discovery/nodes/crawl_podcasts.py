@@ -11,8 +11,8 @@ from graphs.discovery.state import DiscoveryState
 logger = structlog.get_logger()
 
 PODCAST_FEEDS: dict[str, str] = {
-    "macro_voices": "https://feeds.example.com/macrovoices",
-    "odd_lots": "https://feeds.example.com/oddlots",
+    "macro_voices": "https://www.macrovoices.com/podcast-xml",
+    "odd_lots": "https://feeds.megaphone.fm/GLT1412515089",
 }
 
 

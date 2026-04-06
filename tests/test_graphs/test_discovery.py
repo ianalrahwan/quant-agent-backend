@@ -1,9 +1,14 @@
+import os
+
 import respx
 from httpx import Response
 
 from data.models import SourceType
 from graphs.discovery.graph import build_discovery_graph
 from graphs.discovery.state import DiscoveryState
+
+os.environ.setdefault("FMP_API_KEY", "test-key")
+os.environ.setdefault("NEWS_API_KEY", "test-key")
 
 MOCK_FMP_RESPONSE = [
     {
@@ -43,10 +48,12 @@ async def test_discovery_graph_full_run():
     respx.get("https://newsapi.org/v2/everything").mock(
         return_value=Response(200, json=MOCK_NEWS_RESPONSE)
     )
-    respx.get("https://feeds.example.com/macrovoices").mock(
+    respx.get("https://www.macrovoices.com/podcast-xml").mock(
         return_value=Response(500, text="Error")
     )
-    respx.get("https://feeds.example.com/oddlots").mock(return_value=Response(500, text="Error"))
+    respx.get("https://feeds.megaphone.fm/GLT1412515089").mock(
+        return_value=Response(500, text="Error")
+    )
     respx.get("https://www.cftc.gov/dea/newcot/deafut.txt").mock(
         return_value=Response(500, text="Error")
     )

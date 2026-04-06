@@ -3,6 +3,7 @@ from datetime import datetime
 import httpx
 import structlog
 
+from app.config import Settings
 from data.models import CrawlError, RawDocument, SourceType
 from graphs.discovery.state import DiscoveryState
 
@@ -13,14 +14,28 @@ FMP_BASE_URL = "https://financialmodelingprep.com/api/v3"
 
 async def crawl_earnings_node(state: DiscoveryState) -> dict:
     """Fetch earnings call transcripts from Financial Modeling Prep API."""
+    settings = Settings()
     tickers = state.get("target_tickers") or []
     documents: list[RawDocument] = []
     errors: list[CrawlError] = []
 
+    if not settings.fmp_api_key:
+        return {
+            "raw_documents": [],
+            "crawl_errors": [
+                CrawlError(source_type=SourceType.EARNINGS, error="FMP_API_KEY not configured"),
+            ],
+            "completed_sources": [SourceType.EARNINGS],
+            "logs": ["Skipping earnings crawl — FMP_API_KEY not set"],
+        }
+
     async with httpx.AsyncClient(timeout=30.0) as client:
         for ticker in tickers:
             try:
-                resp = await client.get(f"{FMP_BASE_URL}/earning_call_transcript/{ticker}")
+                resp = await client.get(
+                    f"{FMP_BASE_URL}/earning_call_transcript/{ticker}",
+                    params={"apikey": settings.fmp_api_key},
+                )
                 resp.raise_for_status()
                 transcripts = resp.json()
 

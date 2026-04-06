@@ -33,6 +33,10 @@ class Settings(BaseSettings):
         "https://quant-agent-service-ianalrahwans-projects.vercel.app",
     ]
 
+    # Data source API keys
+    fmp_api_key: str | None = None
+    news_api_key: str | None = None
+
     # Anthropic
     anthropic_api_key: str | None = None
 

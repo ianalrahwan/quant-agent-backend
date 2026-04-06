@@ -1,9 +1,13 @@
+import os
+
 import respx
 from httpx import Response
 
 from data.models import SourceType
 from graphs.discovery.nodes.crawl_earnings import crawl_earnings_node
 from graphs.discovery.state import DiscoveryState
+
+os.environ.setdefault("FMP_API_KEY", "test-key")
 
 FMP_TRANSCRIPT_RESPONSE = [
     {

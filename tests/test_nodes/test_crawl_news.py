@@ -1,9 +1,13 @@
+import os
+
 import respx
 from httpx import Response
 
 from data.models import SourceType
 from graphs.discovery.nodes.crawl_news import crawl_news_node
 from graphs.discovery.state import DiscoveryState
+
+os.environ.setdefault("NEWS_API_KEY", "test-key")
 
 NEWS_API_RESPONSE = {
     "status": "ok",
