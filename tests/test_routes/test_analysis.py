@@ -5,6 +5,7 @@ import respx
 from httpx import ASGITransport, AsyncClient, Response
 
 from app.main import create_app
+from sse.bus import InMemorySSEBus
 
 MOCK_NARRATIVE = "Test narrative."
 MOCK_RECS = (
@@ -15,7 +16,9 @@ MOCK_RECS = (
 
 @pytest.fixture
 def app():
-    return create_app()
+    a = create_app()
+    a.state.sse_bus = InMemorySSEBus()
+    return a
 
 
 @pytest.fixture

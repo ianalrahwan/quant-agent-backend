@@ -3,10 +3,27 @@ import json
 from abc import ABC, abstractmethod
 from collections import defaultdict
 from collections.abc import AsyncGenerator
+from contextvars import ContextVar
 
 import redis.asyncio as redis
 
 from models.events import SSEMessage
+
+# Context var holding (bus, job_id) for the current background task
+_bus_ctx: ContextVar[tuple["SSEBus", str] | None] = ContextVar("_bus_ctx", default=None)
+
+
+def set_bus_context(bus: "SSEBus", job_id: str) -> None:
+    """Set the SSE bus context for the current task."""
+    _bus_ctx.set((bus, job_id))
+
+
+async def emit(message: SSEMessage) -> None:
+    """Publish an SSE event if a bus is in context. No-op otherwise."""
+    ctx = _bus_ctx.get()
+    if ctx is not None:
+        bus, job_id = ctx
+        await bus.publish(job_id, message)
 
 
 class SSEBus(ABC):
