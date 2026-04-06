@@ -35,4 +35,13 @@ async def check_freshness_node(state: OrchestratorState) -> dict:
 
     logger.info("check_freshness.done", symbol=symbol, stale=stale, fresh=fresh)
 
-    return {"freshness": report, "discovery_needed": not all_fresh}
+    if all_fresh:
+        log_msg = f"All sources fresh for {symbol}"
+    else:
+        log_msg = f"Sources stale for {symbol}: {', '.join(stale)}"
+
+    return {
+        "freshness": report,
+        "discovery_needed": not all_fresh,
+        "logs": [f"Checking source freshness for {symbol}...", log_msg],
+    }

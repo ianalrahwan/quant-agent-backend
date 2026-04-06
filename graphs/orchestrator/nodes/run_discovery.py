@@ -43,4 +43,13 @@ async def run_discovery_node(state: OrchestratorState) -> dict:
         errors=len(result.get("crawl_errors", [])),
     )
 
-    return {"discovery_needed": False}
+    doc_count = len(result.get("raw_documents", []))
+    error_count = len(result.get("crawl_errors", []))
+
+    logs = [f"Running discovery for {symbol}..."]
+    if doc_count > 0:
+        logs.append(f"Discovery complete — {doc_count} documents indexed")
+    if error_count > 0:
+        logs.append(f"Discovery had {error_count} source errors (partial success)")
+
+    return {"discovery_needed": False, "logs": logs}

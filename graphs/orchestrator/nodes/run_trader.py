@@ -34,7 +34,13 @@ async def run_trader_node(state: OrchestratorState) -> dict:
         recs=len(result.get("trade_recs", [])),
     )
 
+    rec_count = len(result.get("trade_recs", []))
+
     return {
         "trader_narrative": result.get("narrative", ""),
         "trader_trade_recs": result.get("trade_recs", []),
+        "logs": [
+            f"Starting trader analysis for {state['symbol']}...",
+            f"Trader analysis complete — {rec_count} recommendations",
+        ],
     }
