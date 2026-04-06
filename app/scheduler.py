@@ -13,7 +13,7 @@ from sse.bus import set_bus_context
 
 logger = structlog.get_logger()
 
-REFRESH_INTERVAL = 300
+REFRESH_INTERVAL = 900  # 15 min — longer interval to avoid Yahoo rate limits
 
 
 async def _run_for_ticker(app, symbol, signals, session_factory):
@@ -63,7 +63,7 @@ async def _run_for_ticker(app, symbol, signals, session_factory):
 
 async def analysis_refresh_loop(app):
     session_factory = app.state.session_factory
-    await asyncio.sleep(10)
+    await asyncio.sleep(60)  # 1 min startup delay to let rate limits reset
     while True:
         try:
             logger.info("scheduler.refresh_start")
