@@ -30,7 +30,7 @@ class Settings(BaseSettings):
     cors_origins: list[str] = [
         "http://localhost:3000",
         "https://quant-agent-service.vercel.app",
-        "https://quant-agent-service-*.vercel.app",
+        "https://quant-agent-service-ianalrahwans-projects.vercel.app",
     ]
 
     # Anthropic
