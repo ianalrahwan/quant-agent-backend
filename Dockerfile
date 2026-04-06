@@ -14,6 +14,7 @@ RUN uv sync --frozen --no-dev
 # Copy application code
 COPY app/ app/
 COPY db/ db/
+COPY graphs/ graphs/
 COPY models/ models/
 COPY sse/ sse/
 COPY alembic/ alembic/
