@@ -20,8 +20,19 @@ def test_settings_from_env(monkeypatch):
     monkeypatch.setenv("DEBUG", "true")
 
     settings = Settings()
-    assert settings.database_url == "postgresql+asyncpg://u:p@db:5432/prod"
+    assert settings.effective_database_url == "postgresql+asyncpg://u:p@db:5432/prod"
     assert settings.redis_url == "redis://redis:6379/0"
     assert settings.anthropic_api_key == "sk-test-123"
     assert settings.cors_origins == ["https://my-app.vercel.app"]
     assert settings.debug is True
+
+
+def test_settings_from_db_components(monkeypatch):
+    monkeypatch.setenv("DB_HOST", "mydb.rds.amazonaws.com")
+    monkeypatch.setenv("DB_PASSWORD", "secret123")
+    monkeypatch.setenv("REDIS_URL", "redis://localhost:6379/0")
+
+    settings = Settings()
+    assert settings.effective_database_url == (
+        "postgresql+asyncpg://quantagent:secret123@mydb.rds.amazonaws.com:5432/quant_agent?ssl=require"
+    )

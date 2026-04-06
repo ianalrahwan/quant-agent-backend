@@ -8,7 +8,20 @@ class Settings(BaseSettings):
     debug: bool = False
 
     # Database
-    database_url: str
+    database_url: str | None = None
+    db_host: str | None = None
+    db_port: int = 5432
+    db_name: str = "quant_agent"
+    db_user: str = "quantagent"
+    db_password: str | None = None
+
+    @property
+    def effective_database_url(self) -> str:
+        if self.database_url:
+            return self.database_url
+        if self.db_host and self.db_password:
+            return f"postgresql+asyncpg://{self.db_user}:{self.db_password}@{self.db_host}:{self.db_port}/{self.db_name}?ssl=require"
+        raise ValueError("Either DATABASE_URL or DB_HOST + DB_PASSWORD must be set")
 
     # Redis
     redis_url: str

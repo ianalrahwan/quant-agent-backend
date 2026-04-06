@@ -20,7 +20,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
     # Ensure pgvector extension is available
     settings = Settings()
-    engine = create_async_engine(settings.database_url)
+    engine = create_async_engine(settings.effective_database_url)
     async with engine.begin() as conn:
         await conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
     await engine.dispose()
