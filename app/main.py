@@ -3,7 +3,10 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import text
+from sqlalchemy.ext.asyncio import create_async_engine
 
+from app.config import Settings
 from app.logging import setup_logging
 from app.routes import analysis, discovery, health, sources, stream
 from sse.bus import InMemorySSEBus
@@ -14,6 +17,14 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     setup_logging()
     if not hasattr(app.state, "sse_bus"):
         app.state.sse_bus = InMemorySSEBus()
+
+    # Ensure pgvector extension is available
+    settings = Settings()
+    engine = create_async_engine(settings.database_url)
+    async with engine.begin() as conn:
+        await conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
+    await engine.dispose()
+
     yield
 
 
