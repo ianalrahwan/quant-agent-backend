@@ -1,4 +1,4 @@
-"""Async market data fetching via Yahoo Finance."""
+"""Async market data fetching via Yahoo Finance with crumb authentication."""
 
 from __future__ import annotations
 
@@ -9,7 +9,13 @@ import structlog
 
 logger = structlog.get_logger()
 
-_YAHOO_BASE = "https://query1.finance.yahoo.com"
+_YAHOO_BASE = "https://query2.finance.yahoo.com"
+_CRUMB_URL = "https://query2.finance.yahoo.com/v1/test/getcrumb"
+_COOKIE_URL = "https://fc.yahoo.com"
+
+# Module-level crumb cache
+_crumb: str | None = None
+_cookies: httpx.Cookies | None = None
 
 
 # ---------------------------------------------------------------------------
@@ -47,6 +53,48 @@ class VixTermStructure:
 
 
 # ---------------------------------------------------------------------------
+# Auth helpers
+# ---------------------------------------------------------------------------
+
+
+async def _ensure_crumb(client: httpx.AsyncClient) -> str | None:
+    """Obtain a Yahoo crumb token via cookie session."""
+    global _crumb, _cookies  # noqa: PLW0603
+
+    if _crumb and _cookies:
+        return _crumb
+
+    try:
+        # Step 1: Get cookies from Yahoo
+        cookie_resp = await client.get(_COOKIE_URL, follow_redirects=True)
+        _cookies = cookie_resp.cookies
+
+        # Step 2: Get crumb using cookies
+        crumb_resp = await client.get(_CRUMB_URL, cookies=_cookies)
+        crumb_resp.raise_for_status()
+        _crumb = crumb_resp.text.strip()
+        logger.info("yahoo.crumb_obtained", crumb_len=len(_crumb))
+        return _crumb
+    except Exception:
+        logger.warning("yahoo.crumb_failed", exc_info=True)
+        return None
+
+
+async def _yahoo_get(client: httpx.AsyncClient, url: str) -> httpx.Response:
+    """Make an authenticated Yahoo Finance request with crumb + cookies."""
+    crumb = await _ensure_crumb(client)
+    cookies = _cookies or httpx.Cookies()
+
+    if crumb:
+        separator = "&" if "?" in url else "?"
+        url = f"{url}{separator}crumb={crumb}"
+
+    resp = await client.get(url, cookies=cookies)
+    resp.raise_for_status()
+    return resp
+
+
+# ---------------------------------------------------------------------------
 # Fetch helpers
 # ---------------------------------------------------------------------------
 
@@ -55,8 +103,7 @@ async def get_quote(client: httpx.AsyncClient, symbol: str) -> QuoteData | None:
     """Fetch the latest quote for *symbol*."""
     try:
         url = f"{_YAHOO_BASE}/v8/finance/quote?symbols={symbol}"
-        resp = await client.get(url)
-        resp.raise_for_status()
+        resp = await _yahoo_get(client, url)
         data = resp.json()
         result = data["quoteResponse"]["result"]
         if not result:
@@ -75,8 +122,7 @@ async def get_options_chain(client: httpx.AsyncClient, symbol: str) -> OptionsCh
     try:
         # First call to get expiration dates
         url = f"{_YAHOO_BASE}/v7/finance/options/{symbol}"
-        resp = await client.get(url)
-        resp.raise_for_status()
+        resp = await _yahoo_get(client, url)
         data = resp.json()
 
         option_chain = data.get("optionChain", {})
@@ -91,8 +137,7 @@ async def get_options_chain(client: httpx.AsyncClient, symbol: str) -> OptionsCh
         # Parse contracts from each expiration
         for exp in expirations:
             exp_url = f"{_YAHOO_BASE}/v7/finance/options/{symbol}?date={exp}"
-            exp_resp = await client.get(exp_url)
-            exp_resp.raise_for_status()
+            exp_resp = await _yahoo_get(client, exp_url)
             exp_data = exp_resp.json()
 
             exp_results = exp_data.get("optionChain", {}).get("result", [])
@@ -128,8 +173,7 @@ async def get_historical_prices(client: httpx.AsyncClient, symbol: str) -> list[
     """Return 1-year daily closing prices."""
     try:
         url = f"{_YAHOO_BASE}/v8/finance/chart/{symbol}?range=1y&interval=1d"
-        resp = await client.get(url)
-        resp.raise_for_status()
+        resp = await _yahoo_get(client, url)
         data = resp.json()
         result = data.get("chart", {}).get("result", [])
         if not result:
@@ -147,8 +191,7 @@ async def get_vix_term_structure(
     """Fetch VIX and VIX3M to compute term-structure ratio."""
     try:
         url = f"{_YAHOO_BASE}/v8/finance/quote?symbols=%5EVIX,%5EVIX3M"
-        resp = await client.get(url)
-        resp.raise_for_status()
+        resp = await _yahoo_get(client, url)
         data = resp.json()
         results = data.get("quoteResponse", {}).get("result", [])
         if len(results) < 2:
