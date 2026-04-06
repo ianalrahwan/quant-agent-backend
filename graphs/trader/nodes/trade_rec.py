@@ -1,4 +1,5 @@
 import json
+import re
 
 import anthropic
 import structlog
@@ -54,6 +55,13 @@ def _build_prompt(state: TraderState) -> str:
     return "\n".join(parts)
 
 
+def _strip_code_fences(text: str) -> str:
+    """Remove markdown code fences from Claude responses."""
+    cleaned = re.sub(r"^```(?:json)?\s*\n?", "", text.strip())
+    cleaned = re.sub(r"\n?```\s*$", "", cleaned)
+    return cleaned.strip()
+
+
 async def trade_rec_node(state: TraderState) -> dict:
     """Generate trade recommendations using Claude."""
     prompt = _build_prompt(state)
@@ -62,10 +70,15 @@ async def trade_rec_node(state: TraderState) -> dict:
     response = await _call_claude(prompt)
 
     try:
-        recs_data = json.loads(response)
+        cleaned = _strip_code_fences(response)
+        recs_data = json.loads(cleaned)
         trade_recs = [TradeRecommendation(**r) for r in recs_data]
     except (json.JSONDecodeError, ValueError) as exc:
-        logger.error("trade_rec.parse_error", error=str(exc))
+        logger.error(
+            "trade_rec.parse_error",
+            error=str(exc),
+            raw_response=response[:200],
+        )
         trade_recs = []
 
     logger.info("trade_rec.done", symbol=state["symbol"], count=len(trade_recs))
