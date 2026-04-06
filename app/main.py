@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import create_async_engine
 
 from app.config import Settings
 from app.logging import setup_logging
-from app.routes import analysis, cached, discovery, health, sources, stream
+from app.routes import analysis, cached, discovery, health, scanner, sources, stream
 from app.scheduler import analysis_refresh_loop
 from db.session import create_session_factory
 from sse.bus import InMemorySSEBus
@@ -75,6 +75,7 @@ def create_app() -> FastAPI:
     app.include_router(stream.router)
     app.include_router(sources.router)
     app.include_router(cached.router)
+    app.include_router(scanner.router)
 
     return app
 
