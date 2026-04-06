@@ -24,7 +24,7 @@ class Settings(BaseSettings):
         raise ValueError("Either DATABASE_URL or DB_HOST + DB_PASSWORD must be set")
 
     # Redis
-    redis_url: str
+    redis_url: str = "redis://localhost:6379/0"
 
     # CORS
     cors_origins: list[str] = [

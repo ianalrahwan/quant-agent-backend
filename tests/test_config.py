@@ -8,7 +8,8 @@ def test_settings_defaults():
     )
     assert settings.app_name == "quant-agent-backend"
     assert settings.debug is False
-    assert settings.cors_origins == ["http://localhost:3000"]
+    assert "http://localhost:3000" in settings.cors_origins
+    assert "https://quant-agent-service.vercel.app" in settings.cors_origins
     assert settings.anthropic_api_key is None
 
 
