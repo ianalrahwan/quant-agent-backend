@@ -27,7 +27,11 @@ class Settings(BaseSettings):
     redis_url: str
 
     # CORS
-    cors_origins: list[str] = ["http://localhost:3000"]
+    cors_origins: list[str] = [
+        "http://localhost:3000",
+        "https://quant-agent-service.vercel.app",
+        "https://quant-agent-service-*.vercel.app",
+    ]
 
     # Anthropic
     anthropic_api_key: str | None = None
