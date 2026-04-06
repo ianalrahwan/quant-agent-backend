@@ -53,8 +53,8 @@ async def _run_orchestrator(bus: SSEBus, state: OrchestratorState, session_facto
                     await emit(PhaseEvent(phase=phase, status="complete").to_sse())
 
         elapsed = time.monotonic() - t0
-        await emit(DoneEvent(job_id=job_id, total_time=elapsed).to_sse())
 
+        # Write cache BEFORE emitting DoneEvent so frontend can fetch immediately
         if session_factory is not None:
             try:
                 async with session_factory() as session:
@@ -75,6 +75,8 @@ async def _run_orchestrator(bus: SSEBus, state: OrchestratorState, session_facto
                     )
             except Exception as cache_exc:
                 logger.warning("orchestrator.cache_write_failed", error=str(cache_exc))
+
+        await emit(DoneEvent(job_id=job_id, total_time=elapsed).to_sse())
 
         logger.info(
             "orchestrator.complete",
