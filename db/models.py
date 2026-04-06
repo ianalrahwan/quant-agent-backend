@@ -72,3 +72,18 @@ class CachedAnalysis(Base):
         nullable=False,
         server_default=func.now(),
     )
+
+
+class ScannerResult(Base):
+    """Pre-computed scanner scores for instant page load."""
+
+    __tablename__ = "scanner_results"
+
+    symbol: Mapped[str] = mapped_column(String(10), primary_key=True)
+    scores: Mapped[dict] = mapped_column(JSON, nullable=False)
+    composite: Mapped[float] = mapped_column(Float, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+    )
