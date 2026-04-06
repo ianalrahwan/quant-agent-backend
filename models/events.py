@@ -61,3 +61,13 @@ class ErrorEvent(BaseModel):
 
     def to_sse(self) -> SSEMessage:
         return SSEMessage(event="error", data=self.model_dump_json())
+
+
+class LogEvent(BaseModel):
+    """Progress log message from a graph node."""
+
+    message: str
+    phase: str | None = None
+
+    def to_sse(self) -> SSEMessage:
+        return SSEMessage(event="log", data=self.model_dump_json())
