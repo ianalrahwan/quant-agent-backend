@@ -1,6 +1,5 @@
 """Tests for scanner Greeks and criteria helpers."""
 
-
 from app.scanner.criteria import _rolling_realized_vol
 from app.scanner.greeks import charm_bs, gamma_bs, vanna_bs
 
