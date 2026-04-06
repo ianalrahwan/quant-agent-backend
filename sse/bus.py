@@ -63,16 +63,27 @@ class RedisSSEBus(SSEBus):
 
 
 class InMemorySSEBus(SSEBus):
-    """In-memory SSE bus for testing. No Redis dependency."""
+    """In-memory SSE bus with event replay.
+
+    Buffers all published events per job so late subscribers receive
+    the full history before streaming new events.
+    """
 
     def __init__(self) -> None:
         self._queues: dict[str, list[asyncio.Queue[SSEMessage]]] = defaultdict(list)
+        self._history: dict[str, list[SSEMessage]] = defaultdict(list)
 
     async def publish(self, job_id: str, message: SSEMessage) -> None:
+        self._history[job_id].append(message)
         for queue in self._queues[job_id]:
             await queue.put(message)
 
     async def subscribe(self, job_id: str) -> AsyncGenerator[SSEMessage, None]:
+        # Replay buffered events first
+        for msg in self._history[job_id]:
+            yield msg
+
+        # Then stream new events via queue
         queue: asyncio.Queue[SSEMessage] = asyncio.Queue()
         self._queues[job_id].append(queue)
         try:
