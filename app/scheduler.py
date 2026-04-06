@@ -3,8 +3,6 @@ import time
 from uuid import uuid4
 
 import structlog
-from fastapi import FastAPI
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from app.scanner.engine import run_scan
 from data.cache_repo import delete_stale_analyses, upsert_cached_analysis

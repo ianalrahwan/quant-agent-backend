@@ -8,7 +8,6 @@ import time
 from app.scanner.greeks import charm_bs, gamma_bs, vanna_bs
 from app.scanner.market_data import OptionsChainData, VixTermStructure
 
-
 # ---------------------------------------------------------------------------
 # Weights (exported for engine.py)
 # ---------------------------------------------------------------------------

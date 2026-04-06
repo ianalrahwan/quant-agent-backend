@@ -28,8 +28,9 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         await conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
     await engine.dispose()
 
-    from alembic import command
     from alembic.config import Config
+
+    from alembic import command
 
     alembic_cfg = Config("alembic.ini")
     command.upgrade(alembic_cfg, "head")

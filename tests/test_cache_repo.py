@@ -1,6 +1,5 @@
 """Tests for data.cache_repo CRUD functions."""
 
-from datetime import datetime
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
