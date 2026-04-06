@@ -13,6 +13,7 @@ RUN uv sync --frozen --no-dev
 
 # Copy application code
 COPY app/ app/
+COPY data/ data/
 COPY db/ db/
 COPY graphs/ graphs/
 COPY models/ models/
