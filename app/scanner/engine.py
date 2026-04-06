@@ -81,8 +81,16 @@ async def run_scan() -> list[tuple[str, ScannerSignals]]:
         # 1. Fetch VIX term structure once
         vix = await get_vix_term_structure(client)
 
-        # 2. Score all symbols in parallel
-        tasks = [_score_symbol(client, sym, vix) for sym in SCANNER_UNIVERSE]
+        # 2. Score symbols with throttling to avoid Yahoo rate limits
+        sem = asyncio.Semaphore(3)  # max 3 symbols concurrently
+
+        async def _throttled(sym: str):
+            async with sem:
+                result = await _score_symbol(client, sym, vix)
+                await asyncio.sleep(0.5)  # 500ms delay between completions
+                return result
+
+        tasks = [_throttled(sym) for sym in SCANNER_UNIVERSE]
         results = await asyncio.gather(*tasks, return_exceptions=True)
 
     scored: list[tuple[str, ScannerSignals]] = []
