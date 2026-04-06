@@ -1,3 +1,4 @@
+import asyncio
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
@@ -8,7 +9,9 @@ from sqlalchemy.ext.asyncio import create_async_engine
 
 from app.config import Settings
 from app.logging import setup_logging
-from app.routes import analysis, discovery, health, sources, stream
+from app.routes import analysis, cached, discovery, health, sources, stream
+from app.scheduler import analysis_refresh_loop
+from db.session import create_session_factory
 from sse.bus import InMemorySSEBus
 
 
@@ -25,7 +28,13 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         await conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
     await engine.dispose()
 
+    app.state.session_factory = create_session_factory(settings.effective_database_url)
+
+    refresh_task = asyncio.create_task(analysis_refresh_loop(app))
+
     yield
+
+    refresh_task.cancel()
 
 
 def create_app() -> FastAPI:
@@ -49,6 +58,7 @@ def create_app() -> FastAPI:
     app.include_router(discovery.router)
     app.include_router(stream.router)
     app.include_router(sources.router)
+    app.include_router(cached.router)
 
     return app
 

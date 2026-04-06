@@ -5,6 +5,7 @@ import structlog
 from fastapi import APIRouter, BackgroundTasks, Request
 from pydantic import BaseModel
 
+from data.cache_repo import upsert_cached_analysis
 from graphs.orchestrator.graph import build_orchestrator_graph
 from graphs.orchestrator.state import OrchestratorState
 from models.common import JobResponse, ScannerSignals
@@ -28,7 +29,7 @@ class AnalyzeRequest(BaseModel):
     auto_run: bool = False
 
 
-async def _run_orchestrator(bus: SSEBus, state: OrchestratorState) -> None:
+async def _run_orchestrator(bus: SSEBus, state: OrchestratorState, session_factory=None) -> None:
     """Run the orchestrator graph in the background, publishing SSE events."""
     job_id = state["job_id"]
     set_bus_context(bus, job_id)
@@ -36,9 +37,11 @@ async def _run_orchestrator(bus: SSEBus, state: OrchestratorState) -> None:
 
     try:
         graph = build_orchestrator_graph()
+        result = state
 
         async for chunk in graph.astream(state):
             for node_name, node_output in chunk.items():
+                result = {**result, **node_output}
                 phase = ORCHESTRATOR_PHASE_MAP.get(node_name)
 
                 # Publish log events from node output
@@ -51,6 +54,27 @@ async def _run_orchestrator(bus: SSEBus, state: OrchestratorState) -> None:
 
         elapsed = time.monotonic() - t0
         await emit(DoneEvent(job_id=job_id, total_time=elapsed).to_sse())
+
+        if session_factory is not None:
+            try:
+                async with session_factory() as session:
+                    await upsert_cached_analysis(
+                        session=session,
+                        symbol=state["symbol"],
+                        scanner_signals=state["scanner_signals"].model_dump()
+                        if hasattr(state["scanner_signals"], "model_dump")
+                        else state["scanner_signals"],
+                        narrative=result.get("trader_narrative", ""),
+                        trade_recs=[
+                            r.model_dump() if hasattr(r, "model_dump") else r
+                            for r in result.get("trader_trade_recs", [])
+                        ],
+                        vol_surface=None,
+                        phases_log=result.get("logs", []),
+                        total_time=elapsed,
+                    )
+            except Exception as cache_exc:
+                logger.warning("orchestrator.cache_write_failed", error=str(cache_exc))
 
         logger.info(
             "orchestrator.complete",
@@ -90,6 +114,7 @@ async def analyze(
         "logs": [],
     }
 
-    background_tasks.add_task(_run_orchestrator, bus, state)
+    session_factory = getattr(http_request.app.state, "session_factory", None)
+    background_tasks.add_task(_run_orchestrator, bus, state, session_factory)
 
     return JobResponse(job_id=job_id)
