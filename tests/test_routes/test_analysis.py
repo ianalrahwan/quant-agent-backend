@@ -1,4 +1,4 @@
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 import pytest
 import respx
@@ -18,6 +18,7 @@ MOCK_RECS = (
 def app():
     a = create_app()
     a.state.sse_bus = InMemorySSEBus()
+    a.state.session_factory = MagicMock()
     return a
 
 
