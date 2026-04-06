@@ -10,8 +10,8 @@ import structlog
 logger = structlog.get_logger()
 
 _YAHOO_BASE = "https://query2.finance.yahoo.com"
-_CRUMB_URL = "https://query2.finance.yahoo.com/v1/test/getcrumb"
-_COOKIE_URL = "https://fc.yahoo.com"
+_CRUMB_URL = "https://query1.finance.yahoo.com/v1/test/getcrumb"
+_COOKIE_URL = "https://finance.yahoo.com/quote/AAPL"
 
 # Module-level crumb cache
 _crumb: str | None = None
