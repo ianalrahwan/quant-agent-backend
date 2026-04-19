@@ -38,3 +38,17 @@ def test_settings_from_db_components(monkeypatch):
     assert settings.effective_database_url == (
         "postgresql+asyncpg://quantagent:secret123@mydb.rds.amazonaws.com:5432/quant_agent?ssl=require"
     )
+
+
+def test_settings_has_tier_and_rate_limit_fields():
+    from app.config import Settings
+
+    s = Settings(
+        pro_tier_token="test-token",
+        gemini_api_key="test-key",
+    )
+    assert s.pro_tier_token == "test-token"
+    assert s.gemini_api_key == "test-key"
+    assert s.rate_limit_per_ip == 5
+    assert s.rate_limit_window_secs == 3600
+    assert s.rate_limit_global_daily == 300

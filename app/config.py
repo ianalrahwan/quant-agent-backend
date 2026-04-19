@@ -40,4 +40,15 @@ class Settings(BaseSettings):
     # Anthropic
     anthropic_api_key: str | None = None
 
+    # Tier auth
+    pro_tier_token: str | None = None
+
+    # Free tier model
+    gemini_api_key: str | None = None
+
+    # Rate limiting (free tier)
+    rate_limit_per_ip: int = 5
+    rate_limit_window_secs: int = 3600
+    rate_limit_global_daily: int = 300
+
     model_config = {"env_file": ".env", "env_file_encoding": "utf-8"}
