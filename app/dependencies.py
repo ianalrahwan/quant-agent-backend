@@ -46,3 +46,13 @@ def get_tier(request: Request) -> Literal["free", "pro"]:
     if secrets.compare_digest(provided, expected):
         return "pro"
     return "free"
+
+
+def get_client_ip(request: Request) -> str:
+    """Return the originating client IP, preferring X-Forwarded-For."""
+    xff = request.headers.get("X-Forwarded-For", "") if request.headers else ""
+    if xff:
+        return xff.split(",")[0].strip()
+    if request.client is not None:
+        return request.client.host
+    return "0.0.0.0"
