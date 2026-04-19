@@ -53,19 +53,21 @@ async def _run_graph(
         async for chunk in graph.astream(state):
             for node_name, node_output in chunk.items():
                 result = {**result, **node_output}
-                phase = (
-                    ORCHESTRATOR_PHASE_MAP.get(node_name, node_name)
-                    if tier == "pro"
-                    else node_name
-                )
-
-                # Publish log events from node output
-                for log_msg in node_output.get("logs", []):
-                    await emit(LogEvent(message=log_msg).to_sse())
-
-                # Publish phase completion
-                if phase is not None:
-                    await emit(PhaseEvent(phase=phase, status="complete").to_sse())
+                # Pro tier: map node names to frontend phases; free tier: logs only, no phase events
+                if tier == "pro":
+                    phase = ORCHESTRATOR_PHASE_MAP.get(node_name)
+                    if phase is not None:
+                        for log_msg in node_output.get("logs", []):
+                            await emit(LogEvent(message=log_msg).to_sse())
+                        await emit(PhaseEvent(phase=phase, status="complete").to_sse())
+                    else:
+                        # Node maps to None (e.g., "run_trader" publishes its own sub-phases)
+                        for log_msg in node_output.get("logs", []):
+                            await emit(LogEvent(message=log_msg).to_sse())
+                else:
+                    # Free tier: emit logs but NOT phase events
+                    for log_msg in node_output.get("logs", []):
+                        await emit(LogEvent(message=log_msg).to_sse())
 
         elapsed = time.monotonic() - t0
 

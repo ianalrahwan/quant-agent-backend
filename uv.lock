@@ -1384,7 +1384,7 @@ requires-dist = [
     { name = "anthropic", specifier = ">=0.42.0" },
     { name = "asyncpg", specifier = ">=0.30.0" },
     { name = "fastapi", specifier = ">=0.115.0" },
-    { name = "google-genai", specifier = ">=0.3" },
+    { name = "google-genai", specifier = ">=1.0,<2" },
     { name = "httpx", specifier = ">=0.28.0" },
     { name = "langgraph", specifier = ">=0.3.0" },
     { name = "pgvector", specifier = ">=0.3.6" },
