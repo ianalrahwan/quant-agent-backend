@@ -7,8 +7,13 @@ from models.common import ScannerSignals
 
 def _signals(**overrides) -> ScannerSignals:
     base = dict(
-        iv_percentile=0.7, skew_kurtosis=0.4, dealer_gamma=0.5,
-        term_structure=0.5, vanna=0.5, charm=0.5, composite=0.7,
+        iv_percentile=0.7,
+        skew_kurtosis=0.4,
+        dealer_gamma=0.5,
+        term_structure=0.5,
+        vanna=0.5,
+        charm=0.5,
+        composite=0.7,
     )
     base.update(overrides)
     return ScannerSignals(**base)
@@ -19,9 +24,7 @@ async def test_narrate_calls_gemini_and_returns_narrative():
     from graphs.free.nodes import narrate_gemini
 
     return_val = "AAPL is in a stressed vol regime."
-    with patch.object(
-        narrate_gemini, "_call_gemini", new=AsyncMock(return_value=return_val)
-    ):
+    with patch.object(narrate_gemini, "_call_gemini", new=AsyncMock(return_value=return_val)):
         state = {
             "symbol": "AAPL",
             "scanner_signals": _signals(),

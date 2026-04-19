@@ -7,8 +7,13 @@ from models.common import ScannerSignals
 
 def _signals() -> ScannerSignals:
     return ScannerSignals(
-        iv_percentile=0.5, skew_kurtosis=0.5, dealer_gamma=0.5,
-        term_structure=0.5, vanna=0.5, charm=0.5, composite=0.5,
+        iv_percentile=0.5,
+        skew_kurtosis=0.5,
+        dealer_gamma=0.5,
+        term_structure=0.5,
+        vanna=0.5,
+        charm=0.5,
+        composite=0.5,
     )
 
 

@@ -26,7 +26,7 @@ async def _call_gemini(prompt: str) -> str:
 def _build_prompt(state: FreeState) -> str:
     symbol = state["symbol"]
     signals = state["scanner_signals"]  # ScannerSignals Pydantic model
-    vol = state.get("vol_analysis")     # VolSurfaceAnalysis | None
+    vol = state.get("vol_analysis")  # VolSurfaceAnalysis | None
 
     parts = [
         f"You are a quantitative volatility analyst. Briefly explain (2-3 sentences) "
