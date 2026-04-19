@@ -1,4 +1,6 @@
+import secrets
 from collections.abc import AsyncGenerator
+from typing import Literal
 
 from fastapi import Request
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
@@ -27,3 +29,20 @@ async def get_session(request: Request) -> AsyncGenerator[AsyncSession, None]:
     factory: async_sessionmaker[AsyncSession] = request.app.state.session_factory
     async with factory() as session:
         yield session
+
+
+def get_tier(request: Request) -> Literal["free", "pro"]:
+    """Return 'pro' iff request has a valid X-Pro-Token header. Never raises."""
+    settings = get_settings()
+    expected = settings.pro_tier_token
+    if not expected:
+        return "free"
+    try:
+        provided = request.headers.get("X-Pro-Token", "") if request.headers else ""
+    except Exception:
+        return "free"
+    if not provided:
+        return "free"
+    if secrets.compare_digest(provided, expected):
+        return "pro"
+    return "free"
