@@ -1,5 +1,6 @@
 import time
-from typing import Literal
+from collections.abc import Callable
+from typing import Any, Literal
 from uuid import uuid4
 
 import structlog
@@ -36,7 +37,7 @@ class AnalyzeRequest(BaseModel):
 async def _run_graph(
     bus: SSEBus,
     state: dict,
-    graph_builder,
+    graph_builder: Callable[[], Any],
     tier: Literal["free", "pro"],
     session_factory=None,
 ) -> None:

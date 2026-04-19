@@ -34,12 +34,14 @@ async def test_cached_found(mock_get, client):
     mock_row.total_time = 23.5
     mock_row.scanner_signals = {"composite": 0.7}
     mock_row.created_at = datetime(2026, 4, 6, 12, 0, 0, tzinfo=UTC)
+    mock_row.tier = "pro"
     mock_get.return_value = mock_row
     resp = await client.get("/cached/SPY")
     assert resp.status_code == 200
     data = resp.json()
     assert data["symbol"] == "SPY"
     assert data["narrative"] == "Test narrative"
+    assert data["tier"] == "pro"
 
 
 @patch("app.routes.cached.get_cached_analysis")

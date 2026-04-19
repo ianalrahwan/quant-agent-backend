@@ -9,6 +9,12 @@ from app.main import create_app
 from sse.bus import InMemorySSEBus
 
 
+async def _empty_aiter(_state):
+    # matches an async iterator protocol
+    if False:
+        yield  # pragma: no cover
+
+
 def _make_app():
     a = create_app()
     a.state.sse_bus = InMemorySSEBus()
@@ -50,10 +56,14 @@ async def test_post_without_token_routes_to_free_graph(client):
             patch("app.routes.analysis.build_orchestrator_graph") as mock_pro,
         ):
             mock_free.return_value = MagicMock()
+            mock_free.return_value.astream = _empty_aiter
             mock_pro.return_value = MagicMock()
+            mock_pro.return_value.astream = _empty_aiter
             resp = await client.post("/analyze/AAPL", json=_payload())
             assert resp.status_code == 200
             assert resp.json()["job_id"].startswith("job-")
+            mock_free.assert_called_once()
+            mock_pro.assert_not_called()
     finally:
         override_settings(None)  # type: ignore[arg-type]
 
@@ -66,7 +76,9 @@ async def test_post_with_valid_token_routes_to_pro_graph(client):
             patch("app.routes.analysis.build_orchestrator_graph") as mock_pro,
         ):
             mock_free.return_value = MagicMock()
+            mock_free.return_value.astream = _empty_aiter
             mock_pro.return_value = MagicMock()
+            mock_pro.return_value.astream = _empty_aiter
             resp = await client.post(
                 "/analyze/AAPL",
                 json=_payload(),
@@ -74,5 +86,7 @@ async def test_post_with_valid_token_routes_to_pro_graph(client):
             )
             assert resp.status_code == 200
             assert resp.json()["job_id"].startswith("job-")
+            mock_pro.assert_called_once()
+            mock_free.assert_not_called()
     finally:
         override_settings(None)  # type: ignore[arg-type]
