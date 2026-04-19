@@ -6,6 +6,7 @@ from fastapi import Request
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from app.config import Settings
+from app.scanner.rate_limiter import RateLimiter
 
 _settings: Settings | None = None
 
@@ -56,3 +57,8 @@ def get_client_ip(request: Request) -> str:
     if request.client is not None:
         return request.client.host
     return "0.0.0.0"
+
+
+def get_rate_limiter(request: Request) -> RateLimiter:
+    """Return the singleton RateLimiter from app state."""
+    return request.app.state.rate_limiter

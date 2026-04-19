@@ -5,12 +5,14 @@ from functools import partial
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from redis.asyncio import Redis as AsyncRedis
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import create_async_engine
 
 from app.config import Settings
 from app.logging import setup_logging
 from app.routes import analysis, cached, discovery, health, scanner, sources, stream
+from app.scanner.rate_limiter import RateLimiter
 from app.scheduler import analysis_refresh_loop
 from db.session import create_session_factory
 from sse.bus import InMemorySSEBus
@@ -46,11 +48,22 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
     app.state.session_factory = create_session_factory(settings.effective_database_url)
 
+    redis_client = AsyncRedis.from_url(settings.redis_url, decode_responses=True)
+    app.state.redis = redis_client
+    app.state.rate_limiter = RateLimiter(
+        redis=redis_client,
+        per_ip=settings.rate_limit_per_ip,
+        window_secs=settings.rate_limit_window_secs,
+        global_daily=settings.rate_limit_global_daily,
+    )
+
     refresh_task = asyncio.create_task(analysis_refresh_loop(app))
 
-    yield
-
-    refresh_task.cancel()
+    try:
+        yield
+    finally:
+        refresh_task.cancel()
+        await redis_client.aclose()
 
 
 def create_app() -> FastAPI:
