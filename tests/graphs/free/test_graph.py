@@ -37,7 +37,7 @@ async def test_free_graph_runs_three_nodes_in_order():
         assert "load_signals" in nodes_seen
         assert "compute_vol" in nodes_seen
         assert "narrate_gemini" in nodes_seen
-        # Order matters: load_signals must run before compute_vol, and compute_vol before narrate_gemini
+        # Order: load_signals -> compute_vol -> narrate_gemini
         assert nodes_seen.index("load_signals") < nodes_seen.index("compute_vol")
         assert nodes_seen.index("compute_vol") < nodes_seen.index("narrate_gemini")
         # Final state should have narrative set

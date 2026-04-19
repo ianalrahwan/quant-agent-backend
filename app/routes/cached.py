@@ -20,5 +20,6 @@ async def get_cached(symbol: str, session: AsyncSession = Depends(get_session)):
         "vol_surface": result.vol_surface,
         "phases_log": result.phases_log,
         "total_time": result.total_time,
+        "tier": result.tier,
         "created_at": result.created_at.isoformat(),
     }

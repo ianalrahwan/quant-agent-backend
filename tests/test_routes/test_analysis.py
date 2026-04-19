@@ -1,4 +1,4 @@
-from unittest.mock import MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 import respx
@@ -19,6 +19,9 @@ def app():
     a = create_app()
     a.state.sse_bus = InMemorySSEBus()
     a.state.session_factory = MagicMock()
+    rate_limiter = MagicMock()
+    rate_limiter.check = AsyncMock(return_value=None)
+    a.state.rate_limiter = rate_limiter
     return a
 
 

@@ -18,6 +18,7 @@ async def upsert_cached_analysis(
     vol_surface: dict | None,
     phases_log: list,
     total_time: float | None,
+    tier: str = "pro",
 ) -> None:
     """INSERT ... ON CONFLICT (symbol) DO UPDATE SET all columns."""
     stmt = insert(CachedAnalysis).values(
@@ -28,6 +29,7 @@ async def upsert_cached_analysis(
         vol_surface=vol_surface,
         phases_log=phases_log,
         total_time=total_time,
+        tier=tier,
     )
     stmt = stmt.on_conflict_do_update(
         index_elements=["symbol"],
@@ -38,6 +40,7 @@ async def upsert_cached_analysis(
             "vol_surface": stmt.excluded.vol_surface,
             "phases_log": stmt.excluded.phases_log,
             "total_time": stmt.excluded.total_time,
+            "tier": stmt.excluded.tier,
             "created_at": datetime.now(UTC),
         },
     )

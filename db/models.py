@@ -67,6 +67,7 @@ class CachedAnalysis(Base):
     vol_surface: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     phases_log: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
     total_time: Mapped[float | None] = mapped_column(Float, nullable=True)
+    tier: Mapped[str] = mapped_column(String(8), default="pro", server_default="pro")
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,
