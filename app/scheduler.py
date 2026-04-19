@@ -29,6 +29,7 @@ async def analysis_refresh_loop(app):
                         composite=scores.get("composite", 0),
                     )
                 await delete_stale_scanner_results(session, max_age_seconds=600)
+                logger.info("scheduler.scanner_results_stored", count=len(tickers))
                 # Cache cleanup still happens, decoupled from any LLM call
                 await delete_stale_analyses(session, max_age_seconds=3600)
             logger.info("scheduler.refresh_done", tickers=len(tickers))

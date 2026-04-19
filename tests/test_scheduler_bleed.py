@@ -1,5 +1,5 @@
 import asyncio
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
@@ -10,8 +10,7 @@ async def test_scheduler_runs_zero_llm_graphs_per_iteration():
     from app import scheduler
 
     fake_app = AsyncMock()
-    fake_app.state.session_factory = AsyncMock()
-    fake_app.state.sse_bus = AsyncMock()
+    fake_app.state.session_factory = MagicMock()
 
     # Capture the real sleep so the test's own yields still work.
     real_sleep = asyncio.sleep
